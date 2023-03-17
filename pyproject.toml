@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "oetils"
+version = "0.1.0"
+description = "A collection of useful functions and classes"
+authors = ["Onno Eberhard <onnoeberhard@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/onnoeberhard/oetils"
+packages = [
+    { include = "oetils" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+numpy = "^1.24.2"
+matplotlib = "^3.7.1"
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^6.0.0"
+
+[tool.poetry.group.extra]
+optional = true
+
+[tool.poetry.group.extra.dependencies]
+seaborn = "^0.12.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
