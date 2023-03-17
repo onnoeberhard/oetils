@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def init_plotting(latex=None, publish=False, W=None, pad=None, beamer=False, poster=False, seaborn=False, serif=False):
+def init_plotting(latex=None, publish=False, W=None, pad=None, beamer=False,
+        poster=False, seaborn=False, serif=False, show=False):
     plt.plot()    # Needs to be done for some reason
     plt.close()
     if latex is None:
@@ -18,11 +19,11 @@ def init_plotting(latex=None, publish=False, W=None, pad=None, beamer=False, pos
     rc = {
         'text.usetex': latex,
         'figure.constrained_layout.use': True,
-        'figure.dpi': 120,
+        'figure.dpi': 120 if show else 300,
         'figure.figsize': (W, W/sqrt(2)),
         'savefig.pad_inches': pad,
         'savefig.bbox': 'tight',
-        'savefig.dpi': 300
+        'savefig.dpi': 120 if show else 300
     }
     if seaborn:
         import seaborn as sns
@@ -88,7 +89,7 @@ def init_plotting(latex=None, publish=False, W=None, pad=None, beamer=False, pos
     return W
 
 
-class BlitManager:
+class LivePlot:
     """From here: https://matplotlib.org/stable/tutorials/advanced/blitting.html.
     Modified slightly (added a plt.pause call) to support macOS backend.
     """
@@ -168,7 +169,7 @@ class BlitManager:
 
 if __name__ == "__main__":
     # Init plotting
-    init_plotting()
+    init_plotting(show=True)
 
     # Test live plotting
     fig, ax = plt.subplots()
@@ -188,7 +189,7 @@ if __name__ == "__main__":
         va="bottom",
         animated=True,
     )
-    bm = BlitManager(fig.canvas, [ln, fr_number])
+    bm = LivePlot(fig.canvas, [ln, fr_number])
 
     # make sure our window is on the screen and drawn
     plt.show(block=False)
