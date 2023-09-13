@@ -29,6 +29,7 @@ def init_plotting(latex=None, publish=False, W=None, pad=None, beamer=False,
         import seaborn as sns
         sns.set()
     else:
+        import scienceplots
         plt.style.use(('science', 'grid'))
     if publish:
         rc.update({
