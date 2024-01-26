@@ -23,7 +23,13 @@ def init_plotting(latex=None, publish=False, W=None, pad=None, beamer=False,
         'figure.figsize': (W, W/sqrt(2)),
         'savefig.pad_inches': pad,
         'savefig.bbox': 'tight',
-        'savefig.dpi': 120 if show else 300
+        'savefig.dpi': 120 if show else 300,
+        'grid.linestyle': ':',
+        'legend.fancybox': False,
+        'patch.linewidth': 0.5,
+        'legend.edgecolor': 'inherit',
+        'legend.framealpha': 0.8,
+        'lines.linewidth': 1,
     }
     if seaborn:
         import seaborn as sns
