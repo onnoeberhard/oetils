@@ -1,8 +1,10 @@
 from math import sqrt
+from tempfile import NamedTemporaryFile
 
 import matplotlib.pyplot as plt
 import numpy as np
 import scienceplots  # noqa
+from scipy.optimize import root_scalar
 from tueplots import bundles
 
 
@@ -24,6 +26,7 @@ def init_plotting(
     if pad is None:
         pad = 0.01 if bool(venue) else 0.2
 
+    H = W / sqrt(2) - 2*pad
     W -= 2*pad
     plt.rcParams.update(plt.rcParamsDefault)
     plt.style.use(('science', 'grid'))
@@ -31,9 +34,9 @@ def init_plotting(
         'text.usetex': latex,
         'figure.constrained_layout.use': True,
         'figure.dpi': 120 if show else dots / W,
-        'figure.figsize': (W, W/sqrt(2)),
-        'savefig.pad_inches': pad,
+        'figure.figsize': (W, H),
         'savefig.bbox': 'tight',
+        'savefig.pad_inches': pad,
         'savefig.dpi': 120 if show else dots / W,
         'grid.linestyle': ':',
         'grid.alpha': 0.2,
@@ -82,12 +85,12 @@ def init_plotting(
             'lines.markersize': 3,
             'patch.linewidth': 0.4,
             'xtick.major.width': 0.3,
-            'xtick.minor.width': 0.3,
             'xtick.major.size': 2,
+            'xtick.minor.width': 0.3,
             'xtick.minor.size': 1,
             'ytick.major.width': 0.3,
-            'ytick.minor.width': 0.3,
             'ytick.major.size': 2,
+            'ytick.minor.width': 0.3,
             'ytick.minor.size': 1,
         })
     elif venue == 'poster':
@@ -100,6 +103,37 @@ def init_plotting(
         rc.update(bundle)
     plt.rcParams.update(rc | rcparams)
     return W
+
+
+def savefig(fig, path, tries=20, width=None, height=None, pad=None, v=True):
+    pad = pad or plt.rcParams['savefig.pad_inches']
+    dpi = fig.get_dpi()
+    target_width = width = (width or fig.get_figwidth()) + 2*pad
+    target_height = height = (height or fig.get_figheight()) + 2*pad
+
+    def size(w, h):
+        fig.set_size_inches([w - 2*pad, h - 2*pad])
+        with NamedTemporaryFile(suffix='.png') as f:
+            fig.savefig(f.name, pad_inches=pad)
+            h, w, _ = plt.imread(f.name).shape
+            w, h = w / dpi, h / dpi
+        return w, h
+
+    def w_error(x):
+        w, _ = size(x, height)
+        return target_width - w
+
+    def h_error(x):
+        _, h = size(width, x)
+        return target_height - h
+
+    if v: print('Computing figsize...', end=' ')
+    width = root_scalar(w_error, bracket=[0.9*width, 1.1*width], maxiter=tries).root
+    if v: print(f'width error: {abs(w_error(width)):f} (original: {abs(w_error(target_width)):f})', end=', ')
+    height = root_scalar(h_error, bracket=[0.9*height, 1.1*height], maxiter=tries).root
+    if v: print(f'height error: {abs(h_error(height)):f} (original: {abs(h_error(target_height)):f})', )
+    fig.set_size_inches([width - 2*pad, height - 2*pad])
+    fig.savefig(path, pad_inches=pad)
 
 
 class LivePlot:
