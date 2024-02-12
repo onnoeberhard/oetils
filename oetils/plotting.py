@@ -2,79 +2,49 @@ from math import sqrt
 
 import matplotlib.pyplot as plt
 import numpy as np
+import scienceplots  # noqa
+from tueplots import bundles
 
 
-def init_plotting(latex=None, publish=False, W=None, pad=None, beamer=False,
-        poster=False, seaborn=False, serif=False, show=False):
+def init_plotting(venue=None, latex=None, W=None, pad=None, sans=False, sansmath=False, show=False, dots=3000, bundle_kwargs=None, **rcparams):
     plt.plot()    # Needs to be done for some reason
     plt.close()
-    if latex is None:
-        latex = publish or beamer or poster
+    latex = latex or bool(venue)
+    bundle = bundles.__dict__[venue](**(bundle_kwargs or {})) if venue in dir(bundles) else None
     if W is None:
-        W = 5.8 if publish else 6.3 if beamer else 8.27
+        W = 8.27
+        if venue == 'paper':
+            W = 5.8
+        elif venue == 'beamer':
+            W = 6.3
+        elif bundle:
+            W = bundle['figure.figsize'][0]
     if pad is None:
-        pad = 0.01 if publish or beamer or poster else 0.2
+        pad = 0.01 if bool(venue) else 0.2
 
     W -= 2*pad
+    plt.style.use(('science', 'grid'))
     rc = {
         'text.usetex': latex,
         'figure.constrained_layout.use': True,
-        'figure.dpi': 120 if show else 300,
+        'figure.dpi': 120 if show else dots / W,
         'figure.figsize': (W, W/sqrt(2)),
         'savefig.pad_inches': pad,
         'savefig.bbox': 'tight',
-        'savefig.dpi': 120 if show else 300,
+        'savefig.dpi': 120 if show else dots / W,
         'grid.linestyle': ':',
+        'grid.alpha': 0.2,
         'legend.fancybox': False,
-        'patch.linewidth': 0.5,
-        'legend.edgecolor': 'inherit',
         'legend.framealpha': 0.8,
+        'legend.edgecolor': 'inherit',
+        'patch.linewidth': 0.5,
         'lines.linewidth': 1,
+        'errorbar.capsize': 2,
+        'font.size': 11,
+        'axes.labelsize': 11,
+        'legend.fontsize': 11,
+        'font.family': 'sans-serif' if sans or sansmath else 'serif',
     }
-    if seaborn:
-        import seaborn as sns
-        sns.set()
-    else:
-        import scienceplots
-        plt.style.use(('science', 'grid'))
-    if publish:
-        rc.update({
-            'font.size': 8,
-            'axes.labelsize': 8,
-            'axes.titlesize': 8,
-            'legend.fontsize': 8,
-            'legend.title_fontsize': 8,
-            'xtick.labelsize': 8,
-            'ytick.labelsize': 8,
-            'grid.alpha': 0.2,
-            'font.family': 'lmodern'
-        })
-    elif beamer:
-        rc.update({
-            'font.size' : 11,
-            'axes.labelsize': 11,
-            'legend.fontsize': 11,
-            'grid.alpha': 0.2,
-            'font.family': 'sans-serif',
-        })
-    elif poster:
-        # Still using A5 width (ca. A0 width / 6) because very large figures look weird, everything
-        # becomes too thin. This way the text is readable from a but further as well.
-        rc.update({
-            'font.size' : 14,
-            'axes.labelsize': 14,
-            'legend.fontsize': 14,
-            'grid.alpha': 0.2,
-            'font.family': 'sans-serif',
-        })
-    else:
-        rc.update({
-            'font.size' : 11,
-            'axes.labelsize': 11,
-            'legend.fontsize': 11,
-            'grid.alpha': 0.2,
-            'font.family': 'sans-serif'
-        })
     if latex:
         rc.update({
             'text.latex.preamble': (
@@ -89,10 +59,43 @@ def init_plotting(latex=None, publish=False, W=None, pad=None, beamer=False,
             ) + ((
                 r'\usepackage{sansmath}'
                 r'\sansmath'
-            ) if serif else '')
+            ) if sansmath else '')
+            + bundle['text.latex.preamble'] if bundle else ''
         })
-
-    plt.rcParams.update(rc)
+    if venue == 'paper' or bundle:
+        rc.update({
+            'axes.labelsize': (bundle['axes.labelsize'] if bundle else 8),
+            'axes.titlesize': (bundle['axes.titlesize'] if bundle else 8),
+            'font.size': (bundle['font.size'] if bundle else 8),
+            'legend.fontsize': (bundle['legend.fontsize'] if bundle else 6),
+            'xtick.labelsize': (bundle['xtick.labelsize'] if bundle else 6),
+            'ytick.labelsize': (bundle['ytick.labelsize'] if bundle else 6),
+            'axes.linewidth': 0.4,
+            'errorbar.capsize': 1,
+            'grid.linewidth': 0.3,
+            'legend.title_fontsize': 8,
+            'lines.linewidth': 0.8,
+            'lines.markeredgewidth': 0.8,
+            'lines.markersize': 3,
+            'patch.linewidth': 0.4,
+            'xtick.major.width': 0.3,
+            'xtick.minor.width': 0.3,
+            'xtick.major.size': 2,
+            'xtick.minor.size': 1,
+            'ytick.major.width': 0.3,
+            'ytick.minor.width': 0.3,
+            'ytick.major.size': 2,
+            'ytick.minor.size': 1,
+        })
+    elif venue == 'poster':
+        rc.update({
+            'font.size': 14,
+            'axes.labelsize': 14,
+            'legend.fontsize': 14,
+        })
+    if bundle:
+        rc.update(bundle)
+    plt.rcParams.update(rc | rcparams)
     return W
 
 

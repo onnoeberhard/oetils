@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "oetils"
-version = "0.1.2"
+version = "0.2"
 description = "A collection of useful functions and classes"
 authors = ["Onno Eberhard <onnoeberhard@gmail.com>"]
 license = "MIT"
@@ -14,12 +14,15 @@ packages = [
 python = "^3.9"
 numpy = "*"
 matplotlib = "*"
-scienceplots = "^2.1.0"
+scienceplots = "*"
+tueplots = "*"
+scipy = "*"
 
 [tool.poetry.group.dev]
 optional = true
 
 [tool.poetry.group.dev.dependencies]
+jupyter = "^1.0.0"
 flake8 = "^6.0.0"
 
 [tool.poetry.group.extra]
