@@ -26,8 +26,8 @@ def init_plotting(
     if pad is None:
         pad = 0.01 if bool(venue) else 0.2
 
-    H = W / sqrt(2) - 2*pad
-    W -= 2*pad
+    H = W / sqrt(2) - 2*pad + 2*plt.rcParams['figure.constrained_layout.h_pad']
+    W = W - 2*pad + 2*plt.rcParams['figure.constrained_layout.w_pad']
     plt.rcParams.update(plt.rcParamsDefault)
     plt.style.use(('science', 'grid'))
     rc = {
@@ -106,13 +106,16 @@ def init_plotting(
 
 
 def savefig(fig, path, tries=20, width=None, height=None, pad=None, v=True):
+    """Save figure with true size."""
     pad = pad or plt.rcParams['savefig.pad_inches']
+    w_pad = 2 * (pad - plt.rcParams['figure.constrained_layout.w_pad'])
+    h_pad = 2 * (pad - plt.rcParams['figure.constrained_layout.h_pad'])
     dpi = fig.get_dpi()
-    target_width = width = (width or fig.get_figwidth()) + 2*pad
-    target_height = height = (height or fig.get_figheight()) + 2*pad
+    target_width = width = width or fig.get_figwidth() + w_pad
+    target_height = height = height or fig.get_figheight() + h_pad
 
     def size(w, h):
-        fig.set_size_inches([w - 2*pad, h - 2*pad])
+        fig.set_size_inches([w - w_pad, h - h_pad])
         with NamedTemporaryFile(suffix='.png') as f:
             fig.savefig(f.name, pad_inches=pad)
             h, w, _ = plt.imread(f.name).shape
@@ -132,7 +135,7 @@ def savefig(fig, path, tries=20, width=None, height=None, pad=None, v=True):
     if v: print(f'width error: {abs(w_error(width)):f} (original: {abs(w_error(target_width)):f})', end=', ')
     height = root_scalar(h_error, bracket=[0.9*height, 1.1*height], maxiter=tries).root
     if v: print(f'height error: {abs(h_error(height)):f} (original: {abs(h_error(target_height)):f})', )
-    fig.set_size_inches([width - 2*pad, height - 2*pad])
+    fig.set_size_inches([width - w_pad, height - h_pad])
     fig.savefig(path, pad_inches=pad)
 
 
