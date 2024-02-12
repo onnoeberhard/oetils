@@ -47,5 +47,5 @@ def log_smooth(x, n=500, add_last=False):
         y[:, i] = x[:, s:e].mean(1)
     if add_last:
         t = np.r_[t, N - 1]
-        y = np.concatenate([y, x[:, -1, None]], -1)    
+        y = np.concatenate([y, x[:, -1, None]], -1)
     return t, y

@@ -131,10 +131,10 @@ def savefig(fig, path, tries=20, width=None, height=None, pad=None, v=True):
         return target_height - h
 
     if v: print('Computing figsize...', end=' ')
-    width = root_scalar(w_error, bracket=[0.9*width, 1.1*width], maxiter=tries).root
+    width = root_scalar(w_error, x0=width, x1=1.1*width, maxiter=tries).root
     if v: print(f'width error: {abs(w_error(width)):f} (original: {abs(w_error(target_width)):f})', end=', ')
-    height = root_scalar(h_error, bracket=[0.9*height, 1.1*height], maxiter=tries).root
-    if v: print(f'height error: {abs(h_error(height)):f} (original: {abs(h_error(target_height)):f})', )
+    height = root_scalar(h_error, x0=height, x1=1.1*height, maxiter=tries).root
+    if v: print(f'height error: {abs(h_error(height)):f} (original: {abs(h_error(target_height)):f})')
     fig.set_size_inches([width - w_pad, height - h_pad])
     fig.savefig(path, pad_inches=pad)
 
