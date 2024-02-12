@@ -6,7 +6,9 @@ import scienceplots  # noqa
 from tueplots import bundles
 
 
-def init_plotting(venue=None, latex=None, W=None, pad=None, sans=False, sansmath=False, show=False, dots=3000, bundle_kwargs=None, **rcparams):
+def init_plotting(
+        venue=None, latex=None, W=None, pad=None, sans=False, sansmath=False, show=False, dots=3000,
+        bundle_kwargs=None, **rcparams):
     plt.plot()    # Needs to be done for some reason
     plt.close()
     latex = latex or bool(venue)
@@ -23,6 +25,7 @@ def init_plotting(venue=None, latex=None, W=None, pad=None, sans=False, sansmath
         pad = 0.01 if bool(venue) else 0.2
 
     W -= 2*pad
+    plt.rcParams.update(plt.rcParamsDefault)
     plt.style.use(('science', 'grid'))
     rc = {
         'text.usetex': latex,
