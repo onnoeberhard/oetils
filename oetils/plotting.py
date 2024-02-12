@@ -1,3 +1,4 @@
+from copy import deepcopy
 from math import sqrt
 from tempfile import NamedTemporaryFile
 import warnings
@@ -108,17 +109,18 @@ def init_plotting(
 
 def savefig(fig, path, tries=20, width=None, height=None, pad=None, v=True):
     """Save figure with true size."""
+    fig_ = deepcopy(fig)
     pad = pad or plt.rcParams['savefig.pad_inches']
     w_pad = 2 * (pad - plt.rcParams['figure.constrained_layout.w_pad'])
     h_pad = 2 * (pad - plt.rcParams['figure.constrained_layout.h_pad'])
-    dpi = fig.get_dpi()
-    target_width = width = width or fig.get_figwidth() + w_pad
-    target_height = height = height or fig.get_figheight() + h_pad
+    dpi = fig_.get_dpi()
+    target_width = width = width or fig_.get_figwidth() + w_pad
+    target_height = height = height or fig_.get_figheight() + h_pad
 
     def size(w, h):
-        fig.set_size_inches([w - w_pad, h - h_pad])
+        fig_.set_size_inches([w - w_pad, h - h_pad])
         with NamedTemporaryFile(suffix='.png') as f:
-            fig.savefig(f.name, pad_inches=pad)
+            fig_.savefig(f.name, pad_inches=pad)
             h, w, _ = plt.imread(f.name).shape
             w, h = w / dpi, h / dpi
         return w, h
