@@ -140,6 +140,7 @@ def savefig(fig, path, tries=20, width=None, height=None, pad=None, v=True):
         if v: print(f'width error: {abs(w_error(width)):f} (original: {abs(w_error(target_width)):f})', end=', ')
         height = root_scalar(h_error, x0=height, x1=1.1*height, maxiter=tries).root
         if v: print(f'height error: {abs(h_error(height)):f} (original: {abs(h_error(target_height)):f})')
+    plt.close(fig_)
     fig.set_size_inches([width - w_pad, height - h_pad])
     fig.savefig(path, pad_inches=pad)
 
