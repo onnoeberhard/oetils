@@ -68,7 +68,7 @@ def init_plotting(
                 r'\usepackage{sansmath}'
                 r'\sansmath'
             ) if sansmath else '')
-            + bundle['text.latex.preamble'] if bundle else ''
+            + (bundle['text.latex.preamble'] if bundle else '')
         })
     if venue == 'paper' or bundle:
         rc.update({
