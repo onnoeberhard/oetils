@@ -101,8 +101,6 @@ def init_plotting(
             'axes.labelsize': 14,
             'legend.fontsize': 14,
         })
-    if bundle:
-        rc.update(bundle)
     plt.rcParams.update(rc | rcparams)
     return W
 
