@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "oetils"
-version = "0.2.7"
+version = "0.2.8"
 description = "A collection of useful functions and classes"
 authors = ["Onno Eberhard <onnoeberhard@gmail.com>"]
 license = "MIT"
