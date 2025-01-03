@@ -10,12 +10,15 @@ def bootstrap(a, rng, n=1000):
 
 def smooth(x, n=500, add_head=False, add_last=False):
     """Filters and subsamples signal"""
+    flat = x.ndim == 1
+    if flat:
+        x = x[None]
     N = x.shape[1]
     win = N // n
     filt = np.ones(win) / win
     ends = np.linspace(0, N, n + 1)[1:].astype(int)
     starts = np.r_[0, ends[:-1]]
-    t = (starts + (ends) - 1) // 2
+    t = (starts + ends - 1) // 2
     y = np.apply_along_axis(lambda x: np.convolve(filt, x, 'valid'), 1, x)[:, starts]
     if add_head:
         t = np.r_[0, t]
@@ -23,11 +26,34 @@ def smooth(x, n=500, add_head=False, add_last=False):
     if add_last:
         t = np.r_[t, x.shape[1] - 1]
         y = np.concatenate([y, x[:, -1, None]], -1)
-    return t, y
+    return t, y if not flat else y[0]
+
+
+def nansmooth(x, n=500, add_head=False, add_last=False):
+    """Filters and subsamples signal with missing data; n must divide signal length"""
+    flat = x.ndim == 1
+    if flat:
+        x = x[None]
+    N = x.shape[1]
+    win = N // n
+    ends = np.linspace(0, N, n + 1)[1:].astype(int)
+    starts = np.r_[0, ends[:-1]]
+    t = (starts + ends) // 2
+    y = np.nanmean(x.reshape(len(x), win, -1, order='F'), 1)
+    if add_head:
+        t = np.r_[0, t]
+        y = np.concatenate([x[:, 0, None], y], -1)
+    if add_last:
+        t = np.r_[t, x.shape[1] - 1]
+        y = np.concatenate([y, x[:, -1, None]], -1)
+    return t, y if not flat else y[0]
 
 
 def log_smooth(x, n=500, add_last=False):
     """Filters and subsamples signal with logarithmic spacing"""
+    flat = x.ndim == 1
+    if flat:
+        x = x[None]
     N = x.shape[1]
 
     # Find logarithm base
@@ -41,11 +67,11 @@ def log_smooth(x, n=500, add_last=False):
     # Compute indices and smooth signal
     ends = np.ceil(np.cumsum(beta ** np.arange(n))).astype(int)
     starts = np.r_[0, ends[:-1]]
-    t = (starts + (ends - 1)) // 2
+    t = (starts + ends - 1) // 2
     y = np.zeros((len(x), n))
     for i, (s, e) in enumerate(zip(starts, ends)):
         y[:, i] = x[:, s:e].mean(1)
     if add_last:
         t = np.r_[t, N - 1]
         y = np.concatenate([y, x[:, -1, None]], -1)
-    return t, y
+    return t, y if not flat else y[0]
