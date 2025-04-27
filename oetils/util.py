@@ -8,6 +8,15 @@ def bootstrap(a, rng, n=1000):
     return a[idx].mean(1)
 
 
+def boostrap_cis(a, rng, p=0.05, n=1000):
+    bs = np.stack([bootstrap(x, rng, n) for x in a])
+    medians = np.median(bs, 1)
+    lows = np.quantile(bs, p / 2, 1)
+    highs = np.quantile(bs, 1 - p / 2, 1)
+    errs = np.stack([medians - lows, highs - medians])
+    return medians, errs, lows, highs
+
+
 def smooth(x, n=500, add_head=False, add_last=False):
     """Filters and subsamples signal"""
     flat = x.ndim == 1
