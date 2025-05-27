@@ -8,7 +8,7 @@ def bootstrap(a, rng, n=1000):
     return a[idx].mean(1)
 
 
-def boostrap_cis(a, rng, p=0.05, n=1000):
+def bootstrap_cis(a, rng, p=0.05, n=1000):
     bs = np.stack([bootstrap(x, rng, n) for x in a])
     medians = np.median(bs, 1)
     lows = np.quantile(bs, p / 2, 1)
