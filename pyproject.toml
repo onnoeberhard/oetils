@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "oetils"
-version = "0.2.9.1"
+version = "0.2.10"
 description = "A collection of useful functions and classes"
 authors = ["Onno Eberhard <onnoeberhard@gmail.com>"]
 license = "MIT"
@@ -17,6 +17,8 @@ matplotlib = "*"
 scienceplots = "*"
 tueplots = "*"
 scipy = "*"
+jax = "*"
+tqdm = "*"
 
 [tool.poetry.group.dev]
 optional = true
@@ -29,7 +31,7 @@ flake8 = "^6.0.0"
 optional = true
 
 [tool.poetry.group.extra.dependencies]
-seaborn = "^0.12.2"
+
 
 [build-system]
 requires = ["poetry-core"]

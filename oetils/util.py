@@ -1,5 +1,7 @@
+import jax
 import numpy as np
 from scipy.optimize import root_scalar
+from tqdm.auto import tqdm
 
 
 def bootstrap(a, rng, n=1000):
@@ -84,3 +86,22 @@ def log_smooth(x, n=500, add_last=False):
         t = np.r_[t, N - 1]
         y = np.concatenate([y, x[:, -1, None]], -1)
     return t, y if not flat else y[0]
+
+class JaxTqdm:
+    def __init__(self, n, n_updates=100, **kwargs):
+        self.n = n
+        self.print_rate = max(1, n // n_updates)
+        self.pbar = tqdm(total=self.n, **kwargs)
+
+    def update(self):
+        self.pbar.update(self.print_rate)
+
+    def write(self, msg):
+        self.pbar.write(msg)
+
+    def loop(self, func):
+        def f(i, val):
+            jax.lax.cond((i + 1) % self.print_rate == 0,
+                lambda: jax.debug.callback(self.update, ordered=True), lambda: None)
+            return func(i, val)
+        return f
