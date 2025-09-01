@@ -87,6 +87,7 @@ def log_smooth(x, n=500, add_last=False):
         y = np.concatenate([y, x[:, -1, None]], -1)
     return t, y if not flat else y[0]
 
+
 class JaxTqdm:
     def __init__(self, n, n_updates=100, **kwargs):
         self.n = n

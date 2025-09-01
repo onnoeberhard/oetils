@@ -107,7 +107,7 @@ def init_plotting(
     return W
 
 
-def savefig(fig, path, tries=20, width=None, height=None, pad=None, v=True):
+def savefig(fig, path, tries=20, width=None, height=None, pad=None, v=True, **kwargs):
     """Save figure with true size."""
     fig_ = deepcopy(fig)
     pad = pad or plt.rcParams['savefig.pad_inches']
@@ -142,7 +142,7 @@ def savefig(fig, path, tries=20, width=None, height=None, pad=None, v=True):
         if v: print(f'height error: {abs(h_error(height)):f} (original: {abs(h_error(target_height)):f})')
     plt.close(fig_)
     fig.set_size_inches([width - w_pad, height - h_pad])
-    fig.savefig(path, pad_inches=pad)
+    fig.savefig(path, pad_inches=pad, **kwargs)
 
 
 class LivePlot:
