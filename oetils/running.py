@@ -10,6 +10,9 @@ from cluster_utils import finalize_job, initialize_job
 from smart_settings.param_classes import recursive_objectify
 
 
+def run(params, path):
+    raise NotImplementedError("'run' function not found!")
+
 def main():
     """General main function.
 
@@ -76,7 +79,8 @@ def main():
             else sys.stdout) as f, redirect_stdout(f):
         print(now.strftime("%Y-%m-%d %H:%M:%S") + '\n' + str(params),
             flush=True)
-        function = globals()[fun] if (fun := params.get('function')) else run
+        function = globals()[fun] if (fun := params.get('function')) \
+            else globals()['run']
         vars_ = getfullargspec(function)[0]
         metrics = function(**(({'path': path} if 'path' in vars_ else {})
             | ({'params': params} if 'params' in vars_ else {})
