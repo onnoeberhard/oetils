@@ -13,13 +13,13 @@ from smart_settings.param_classes import recursive_objectify
 def run(params, path):
     raise NotImplementedError("'run' function not found!")
 
-def main():
+def main(globals):
     """General main function.
 
-    If no arguments are passed, will call the "run" function. If one command
-    line argument is passed, this will be first interpreted as the path to
-    a config.yaml file. If this fails, it will be interpreted as the name of
-    the function that is supposed to be run. With the option
+    If no command line arguments are passed, will call the "run" function. If
+    one command line argument is passed, this will be first interpreted as the 
+    path to a config.yaml file. If this fails, it will be interpreted as the
+    name of the function that is supposed to be run. With the option
     `--parameter-dict`, a python dictionary can also be passed (as a string)
     instead of a config.yaml file.
     The following config keys have a special meaning: `function` (the function
@@ -35,6 +35,7 @@ def main():
     unless the run is temporary (unnamed) or `interactive` is explicitly set.
     """
     now = datetime.now()
+    globals = globals() | globals
 
     # Read hyperparameters (either params from file or single function name)
     conf = {}
@@ -79,8 +80,8 @@ def main():
             else sys.stdout) as f, redirect_stdout(f):
         print(now.strftime("%Y-%m-%d %H:%M:%S") + '\n' + str(params),
             flush=True)
-        function = globals()[fun] if (fun := params.get('function')) \
-            else globals()['run']
+        function = globals[fun] if (fun := params.get('function')) \
+            else globals['run']
         vars_ = getfullargspec(function)[0]
         metrics = function(**(({'path': path} if 'path' in vars_ else {})
             | ({'params': params} if 'params' in vars_ else {})
