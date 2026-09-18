@@ -10,9 +10,6 @@ from cluster_utils import finalize_job, initialize_job
 from smart_settings.param_classes import recursive_objectify
 
 
-def run(params, path):
-    raise NotImplementedError("'run' function not found!")
-
 def main():
     """General main function.
 
