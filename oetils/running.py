@@ -13,7 +13,7 @@ from smart_settings.param_classes import recursive_objectify
 def run(params, path):
     raise NotImplementedError("'run' function not found!")
 
-def main(globals):
+def main(globals_):
     """General main function.
 
     If no command line arguments are passed, will call the "run" function. If
@@ -35,7 +35,7 @@ def main(globals):
     unless the run is temporary (unnamed) or `interactive` is explicitly set.
     """
     now = datetime.now()
-    globals = globals() | globals
+    globals_ = globals() | globals_
 
     # Read hyperparameters (either params from file or single function name)
     conf = {}
@@ -80,8 +80,8 @@ def main(globals):
             else sys.stdout) as f, redirect_stdout(f):
         print(now.strftime("%Y-%m-%d %H:%M:%S") + '\n' + str(params),
             flush=True)
-        function = globals[fun] if (fun := params.get('function')) \
-            else globals['run']
+        function = globals_[fun] if (fun := params.get('function')) \
+            else globals_['run']
         vars_ = getfullargspec(function)[0]
         metrics = function(**(({'path': path} if 'path' in vars_ else {})
             | ({'params': params} if 'params' in vars_ else {})
