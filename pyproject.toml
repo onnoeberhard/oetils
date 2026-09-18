@@ -1,38 +1,48 @@
-[tool.poetry]
+[project]
 name = "oetils"
 version = "0.2.11"
 description = "A collection of useful functions and classes"
-authors = ["Onno Eberhard <onnoeberhard@gmail.com>"]
-license = "MIT"
+authors = [{ name = "Onno Eberhard", email = "onnoeberhard@gmail.com" }]
+requires-python = ">=3.9"
 readme = "README.md"
-repository = "https://github.com/onnoeberhard/oetils"
-packages = [
-    { include = "oetils" }
+license = "MIT"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "numpy",
+    "matplotlib",
+    "scienceplots",
+    "tueplots",
+    "scipy",
+    "jax",
+    "tqdm",
+    "cluster-utils",
+    "al-smart-settings"
 ]
 
-[tool.poetry.dependencies]
-python = "^3.9"
-numpy = "*"
-matplotlib = "*"
-scienceplots = "*"
-tueplots = "*"
-scipy = "*"
-jax = "*"
-tqdm = "*"
+[tool.uv.sources]
+cluster-utils = { git = "https://github.com/martius-lab/cluster_utils" }
+al-smart-settings = { git = "https://github.com/martius-lab/smart-settings" }
 
-[tool.poetry.group.dev]
-optional = true
+[project.urls]
+Repository = "https://github.com/onnoeberhard/oetils"
 
-[tool.poetry.group.dev.dependencies]
-jupyter = "^1.0.0"
-flake8 = "^6.0.0"
+[dependency-groups]
+dev = [
+    "ipdb>=0.13.13",
+]
 
-[tool.poetry.group.extra]
-optional = true
-
-[tool.poetry.group.extra.dependencies]
-
+[tool.uv.build-backend]
+module-name = ["oetils"]
+module-root = ""
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.12.10,<0.13.0"]
+build-backend = "uv_build"

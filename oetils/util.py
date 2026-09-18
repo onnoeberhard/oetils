@@ -30,7 +30,8 @@ def smooth(x, n=500, add_head=False, add_last=False):
     ends = np.linspace(0, N, n + 1)[1:].astype(int)
     starts = np.r_[0, ends[:-1]]
     t = (starts + ends - 1) // 2
-    y = np.apply_along_axis(lambda x: np.convolve(filt, x, 'valid'), 1, x)[:, starts]
+    y = np.apply_along_axis(
+        lambda x: np.convolve(filt, x, 'valid'), 1, x)[:, starts]
     if add_head:
         t = np.r_[0, t]
         y = np.concatenate([x[:, 0, None], y], -1)
@@ -41,7 +42,8 @@ def smooth(x, n=500, add_head=False, add_last=False):
 
 
 def nansmooth(x, n=500, add_head=False, add_last=False):
-    """Filters and subsamples signal with missing data; n must divide signal length"""
+    """Filters and subsamples signal with missing data; n must divide signal
+    length"""
     flat = x.ndim == 1
     if flat:
         x = x[None]
@@ -97,12 +99,12 @@ class JaxTqdm:
     def update(self):
         self.pbar.update(self.print_rate)
 
-    def write(self, msg):
-        self.pbar.write(msg)
+    def write(self, msg, **kwargs):
+        self.pbar.write(msg, **kwargs)
 
-    def loop(self, func):
+    def __call__(self, func):
         def f(i, val):
-            jax.lax.cond((i + 1) % self.print_rate == 0,
-                lambda: jax.debug.callback(self.update, ordered=True), lambda: None)
+            jax.lax.cond((i + 1) % self.print_rate == 0, lambda:
+                jax.debug.callback(self.update, ordered=True), lambda: None)
             return func(i, val)
         return f
