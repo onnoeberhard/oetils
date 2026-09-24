@@ -1,6 +1,6 @@
 [project]
 name = "oetils"
-version = "0.2.11"
+version = "0.2.12"
 description = "A collection of useful functions and classes"
 authors = [{ name = "Onno Eberhard", email = "onnoeberhard@gmail.com" }]
 requires-python = ">=3.9"
@@ -24,7 +24,8 @@ dependencies = [
     "jax",
     "tqdm",
     "cluster-utils",
-    "al-smart-settings"
+    "al-smart-settings",
+    "scikit-learn>=1.6.1",
 ]
 
 [tool.uv.sources]

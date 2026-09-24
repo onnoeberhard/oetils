@@ -82,10 +82,13 @@ def main(globals_):
             flush=True)
         function = globals_[fun] if (fun := params.get('function')) \
             else globals_['run']
-        vars_ = getfullargspec(function)[0]
-        metrics = function(**(({'path': path} if 'path' in vars_ else {})
-            | ({'params': params} if 'params' in vars_ else {})
-            | {var: params[var] for var in vars_ if var in params}))
+        vars = getfullargspec(function)[0]
+        metrics = {}
+        for grid_params in ParameterGrid(params.get('grid_params', {})):
+            metrics[tuple(grid_params.items())] = function(**(
+                ({'path': path} if 'path' in vars else {})
+                | ({'params': params} if 'params' in vars else {})
+                | {v: params[v] for v in vars if v in params | grid_params}))
 
     if cluster:
         finalize_job(metrics or {}, params)
