@@ -1,12 +1,13 @@
+from contextlib import redirect_stdout
+import csv
 from datetime import datetime
-import sys
+from inspect import getfullargspec
 from pathlib import Path
 import shutil
-import csv
-from contextlib import redirect_stdout
-from inspect import getfullargspec
+import sys
 
 from cluster_utils import finalize_job, initialize_job
+from sklearn.model_selection import ParameterGrid
 from smart_settings.param_classes import recursive_objectify
 
 
@@ -92,8 +93,4 @@ def main(globals_):
 
     if cluster:
         finalize_job(metrics or {}, params)
-
-
-if __name__ == "__main__":
-    main()
 

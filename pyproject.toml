@@ -38,6 +38,7 @@ Repository = "https://github.com/onnoeberhard/oetils"
 [dependency-groups]
 dev = [
     "ipdb>=0.13.13",
+    "pyright>=1.1.414",
 ]
 
 [tool.uv.build-backend]
