@@ -48,6 +48,7 @@ def main(globals_):
         sys.argv = [sys.argv[0]]
         params = initialize_job(
             sys.argv + ['--parameter-dict', '{}'], verbose=False)
+    param_grid = ParameterGrid(params.get('param_grid', {}))
     params = dictify(params)
     params = recursive_objectify(params, make_immutable=False)
     params.update(conf | dict(params.get('conf') or {}))
@@ -84,9 +85,9 @@ def main(globals_):
         function = globals_[fun] if (fun := params.get('function')) \
             else globals_['run']
         vars = getfullargspec(function)[0]
-        param_grid = ParameterGrid(params.get('param_grid', {}))
         for i, grid_params in enumerate(param_grid):
-            params_ = recursive_objectify(params | grid_params | {'grid_id': i})
+            params_ = recursive_objectify(
+                params | dictify(grid_params) | {'grid_id': i})
             print(now.strftime("%Y-%m-%d %H:%M:%S") + '\n' + str(params_),
                 flush=True)
             metrics[tuple(grid_params.items())] = function(**(
