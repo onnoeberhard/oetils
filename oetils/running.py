@@ -5,6 +5,7 @@ from inspect import getfullargspec
 from pathlib import Path
 import shutil
 import sys
+from copy import deepcopy
 
 from cluster_utils import finalize_job, initialize_job
 from sklearn.model_selection import ParameterGrid
@@ -87,7 +88,7 @@ def main(globals_):
         vars = getfullargspec(function)[0]
         for i, grid_params in enumerate(param_grid):
             params_ = recursive_objectify(update_recursive(
-                params, dictify(grid_params)) | {'grid_id': i})
+                deepcopy(params), dictify(grid_params)) | {'grid_id': i})
             print(now.strftime("%Y-%m-%d %H:%M:%S") + '\n' + str(params_),
                 flush=True)
             metrics[tuple(grid_params.items())] = function(**(
