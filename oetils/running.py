@@ -49,6 +49,7 @@ def main(globals_):
         params = initialize_job(
             sys.argv + ['--parameter-dict', '{}'], verbose=False)
     params = recursive_objectify(params, make_immutable=False)
+    params = dictify(params)
     params.update(conf | dict(params.get('conf') or {}))
 
     # Configure working directory and job name
@@ -94,3 +95,11 @@ def main(globals_):
     if cluster:
         finalize_job(metrics or {}, params)
 
+def dictify(d):
+    d_ = {}
+    for k, v in d.items():
+        if '.' in k:
+            k, r = k.split('.', 1)
+            v = dictify({r: v})
+        d_[k] = v if k not in d_ else v | d_[k]
+    return d_
