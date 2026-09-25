@@ -86,7 +86,7 @@ def main(globals_):
             else globals_['run']
         vars = getfullargspec(function)[0]
         metrics = {}
-        for grid_params in ParameterGrid(params.get('grid_params', {})):
+        for grid_params in ParameterGrid(params.get('param_grid', {})):
             metrics[tuple(grid_params.items())] = function(**(
                 ({'path': path} if 'path' in vars else {})
                 | ({'params': params} if 'params' in vars else {})
