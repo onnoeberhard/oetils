@@ -52,7 +52,7 @@ def main(globals_):
     param_grid = ParameterGrid(params.get('param_grid', {}))
     params = dictify(params)
     params = recursive_objectify(params, make_immutable=False)
-    params.update(conf | dict(params.get('conf') or {}))  # update_recursive?
+    update_recursive(params, conf | params.get('conf', {}), overwrite=True)
 
     # Configure working directory and job name
     named = 'name' in params
@@ -87,8 +87,8 @@ def main(globals_):
             else globals_['run']
         vars = getfullargspec(function)[0]
         for i, grid_params in enumerate(param_grid):
-            params_ = recursive_objectify(update_recursive(
-                deepcopy(params), dictify(grid_params)) | {'grid_id': i})
+            params_ = recursive_objectify(update_recursive(deepcopy(params),
+                dictify(grid_params), overwrite=True) | {'grid_id': i})
             print(now.strftime("%Y-%m-%d %H:%M:%S") + '\n' + str(params_),
                 flush=True)
             metrics[tuple(grid_params.items())] = function(**(
