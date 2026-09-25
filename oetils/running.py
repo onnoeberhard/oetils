@@ -87,7 +87,7 @@ def main(globals_):
         vars = getfullargspec(function)[0]
         metrics = {}
         for grid_params in ParameterGrid(params.get('param_grid', {})):
-            params_ = params | grid_params
+            params_ = recursive_objectify(params | grid_params)
             metrics[tuple(grid_params.items())] = function(**(
                 ({'path': path} if 'path' in vars else {})
                 | ({'params': params_} if 'params' in vars else {})
