@@ -80,15 +80,15 @@ def main(globals_):
     interactive = params.interactive if 'interactive' in params else not named
     with (open(path / 'log.txt', 'a' if named else 'w') if not interactive 
             else sys.stdout) as f, redirect_stdout(f):
-        print(now.strftime("%Y-%m-%d %H:%M:%S") + '\n' + str(params),
-            flush=True)
+        metrics = {}
         function = globals_[fun] if (fun := params.get('function')) \
             else globals_['run']
         vars = getfullargspec(function)[0]
-        metrics = {}
         param_grid = ParameterGrid(params.get('param_grid', {}))
         for i, grid_params in enumerate(param_grid):
             params_ = recursive_objectify(params | grid_params | {'grid_id': i})
+            print(now.strftime("%Y-%m-%d %H:%M:%S") + '\n' + str(params_),
+                flush=True)
             metrics[tuple(grid_params.items())] = function(**(
                 ({'path': path} if 'path' in vars else {})
                 | ({'params': params_} if 'params' in vars else {})
@@ -98,8 +98,10 @@ def main(globals_):
         finalize_job(metrics or {}, params)
 
 def dictify(d):
+    if not isinstance(d, dict): return d
     d_ = {}
     for k, v in d.items():
+        v = dictify(v)
         if '.' in k:
             k, r = k.split('.', 1)
             v = dictify({r: v})
