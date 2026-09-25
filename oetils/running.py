@@ -88,12 +88,11 @@ def main(globals_):
         metrics = {}
         param_grid = ParameterGrid(params.get('param_grid', {}))
         for i, grid_params in enumerate(param_grid):
-            params_ = recursive_objectify(params | grid_params)
+            params_ = recursive_objectify(params | grid_params | {'grid_id': i})
             metrics[tuple(grid_params.items())] = function(**(
                 ({'path': path} if 'path' in vars else {})
                 | ({'params': params_} if 'params' in vars else {})
-                | {v: params_[v] for v in vars if v in params_}
-                | {'grid_id': i}))
+                | {v: params_[v] for v in vars if v in params_}))
 
     if cluster:
         finalize_job(metrics or {}, params)
