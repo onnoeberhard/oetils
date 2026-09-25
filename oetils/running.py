@@ -48,8 +48,8 @@ def main(globals_):
         sys.argv = [sys.argv[0]]
         params = initialize_job(
             sys.argv + ['--parameter-dict', '{}'], verbose=False)
-    params = recursive_objectify(params, make_immutable=False)
     params = dictify(params)
+    params = recursive_objectify(params, make_immutable=False)
     params.update(conf | dict(params.get('conf') or {}))
 
     # Configure working directory and job name
