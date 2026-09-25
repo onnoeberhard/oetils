@@ -8,7 +8,7 @@ import sys
 
 from cluster_utils import finalize_job, initialize_job
 from sklearn.model_selection import ParameterGrid
-from smart_settings.param_classes import recursive_objectify
+from smart_settings.param_classes import recursive_objectify, update_recursive
 
 
 def run(params, path):
@@ -51,7 +51,7 @@ def main(globals_):
     param_grid = ParameterGrid(params.get('param_grid', {}))
     params = dictify(params)
     params = recursive_objectify(params, make_immutable=False)
-    params.update(conf | dict(params.get('conf') or {}))
+    params.update(conf | dict(params.get('conf') or {}))  # update_recursive?
 
     # Configure working directory and job name
     named = 'name' in params
@@ -86,8 +86,8 @@ def main(globals_):
             else globals_['run']
         vars = getfullargspec(function)[0]
         for i, grid_params in enumerate(param_grid):
-            params_ = recursive_objectify(
-                params | dictify(grid_params) | {'grid_id': i})
+            params_ = recursive_objectify(update_recursive(
+                params, dictify(grid_params)) | {'grid_id': i})
             print(now.strftime("%Y-%m-%d %H:%M:%S") + '\n' + str(params_),
                 flush=True)
             metrics[tuple(grid_params.items())] = function(**(
