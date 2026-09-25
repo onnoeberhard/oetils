@@ -1,3 +1,4 @@
+from collections.abc import Mapping, Sequence
 from contextlib import redirect_stdout
 import csv
 from datetime import datetime
@@ -9,7 +10,7 @@ from copy import deepcopy
 
 from cluster_utils import finalize_job, initialize_job
 from sklearn.model_selection import ParameterGrid
-from smart_settings.param_classes import recursive_objectify, update_recursive
+from smart_settings.param_classes import recursive_objectify, removesuffix
 
 
 def run(params, path):
@@ -52,7 +53,7 @@ def main(globals_):
     param_grid = ParameterGrid(params.get('param_grid', {}))
     params = dictify(params)
     params = recursive_objectify(params, make_immutable=False)
-    update_recursive(params, conf | params.get('conf', {}), overwrite=True)
+    update_recursive(params, conf | params.get('conf', {}))
 
     # Configure working directory and job name
     named = 'name' in params
@@ -87,8 +88,8 @@ def main(globals_):
             else globals_['run']
         vars = getfullargspec(function)[0]
         for i, grid_params in enumerate(param_grid):
-            params_ = recursive_objectify(update_recursive(deepcopy(params),
-                dictify(grid_params), overwrite=True) | {'grid_id': i})
+            params_ = recursive_objectify(update_recursive(
+                deepcopy(params), dictify(grid_params)) | {'grid_id': i})
             print(now.strftime("%Y-%m-%d %H:%M:%S") + '\n' + str(params_),
                 flush=True)
             metrics[tuple(grid_params.items())] = function(**(
@@ -109,3 +110,19 @@ def dictify(d):
             v = dictify({r: v})
         d_[k] = v if k not in d_ else v | d_[k]
     return d_
+
+def update_recursive(d, u):
+    for k, v in u.items():
+        if isinstance(v, Mapping):
+            d[k] = update_recursive(d.get(k, {}), v)
+        elif isinstance(v, Sequence):
+            raw_key = removesuffix(k, "*")
+            if raw_key + "*" in d:  # append
+                d[raw_key + "*"] = deepcopy(v + d[raw_key + "*"])
+            elif raw_key in d:  # keep original list
+                pass
+            else:  # key does not exist yet, append
+                d[k] = v
+        else:
+            d[k] = v
+    return d
