@@ -81,19 +81,21 @@ def main(globals_):
     metrics = None
     print(f"Using path {path}.")
     interactive = params.interactive if 'interactive' in params else not named
-    with (open(path / 'log.txt', 'a' if named else 'w') if not interactive 
-            else sys.stdout) as f, redirect_stdout(f):
-        metrics = {}
-        function = globals_[fun] if (fun := params.get('function')) \
-            else globals_['run']
-        vars = getfullargspec(function)[0]
-        for i, grid_params in enumerate(param_grid):
+    metrics = {}
+    function = globals_[fun] if (fun := params.get('function')) \
+        else globals_['run']
+    vars = getfullargspec(function)[0]
+    for i, grid_params in enumerate(param_grid):
+        path_ = (path / f'{i}') if len(param_grid) > 1 else path
+        path_.mkdir()
+        with (open(path_ / 'log.txt', 'a' if named else 'w') if not interactive
+                else sys.stdout) as f, redirect_stdout(f):
             params_ = recursive_objectify(update_recursive(
                 deepcopy(params), dictify(grid_params)) | {'grid_id': i})
             print(now.strftime("%Y-%m-%d %H:%M:%S") + '\n' + str(params_),
                 flush=True)
             metrics[tuple(grid_params.items())] = function(**(
-                ({'path': path} if 'path' in vars else {})
+                ({'path': path_} if 'path' in vars else {})
                 | ({'params': params_} if 'params' in vars else {})
                 | {v: params_[v] for v in vars if v in params_}))
 
