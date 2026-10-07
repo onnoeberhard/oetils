@@ -88,10 +88,11 @@ def main(globals_):
     for i, grid_params in enumerate(param_grid):
         path_ = (path / f'{i}') if len(param_grid) > 1 else path
         path_.mkdir()
+        params_ = recursive_objectify(update_recursive(
+            deepcopy(params), dictify(grid_params)) | {'grid_id': i})
+        with open(path_ / 'params.json', 'w') as f: f.write(str(params_))
         with (open(path_ / 'log.txt', 'a' if named else 'w') if not interactive
                 else sys.stdout) as f, redirect_stdout(f):
-            params_ = recursive_objectify(update_recursive(
-                deepcopy(params), dictify(grid_params)) | {'grid_id': i})
             print(now.strftime("%Y-%m-%d %H:%M:%S") + '\n' + str(params_),
                 flush=True)
             metrics[tuple(grid_params.items())] = function(**(
