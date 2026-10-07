@@ -98,6 +98,7 @@ class JaxTqdm:
 
     def update(self):
         self.pbar.update(self.print_rate)
+        if self.pbar.n >= self.n: self.pbar.close()
 
     def write(self, msg, **kwargs):
         self.pbar.write(msg, **kwargs)
