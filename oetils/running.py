@@ -87,7 +87,7 @@ def main(globals_):
     vars = getfullargspec(function)[0]
     for i, grid_params in enumerate(param_grid):
         path_ = (path / f'{i}') if len(param_grid) > 1 else path
-        path_.mkdir()
+        path_.mkdir(exist_ok=True)
         params_ = recursive_objectify(update_recursive(
             deepcopy(params), dictify(grid_params)) | {'grid_id': i})
         with open(path_ / 'params.json', 'w') as f: f.write(str(params_))
