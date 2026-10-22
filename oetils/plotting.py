@@ -59,11 +59,14 @@ def init_plotting(
         'axes.facecolor': (1, 1, 1, 1)
     }
     if latex:
-        rc.update({
-            'text.latex.preamble': r'''
-                \usepackage{lmodern}
+        rc.update({'text.latex.preamble': r'''
                 \usepackage[T1]{fontenc}
                 \usepackage[utf8]{inputenc}
+            ''' + (r'''
+                \usepackage{beton}
+                \usepackage{euler}
+            ''' if venue in ['beamer', 'poster'] else r'\usepackage{lmodern}')
+            + r'''
                 \usepackage{amssymb}
                 \usepackage{amsmath}
                 \usepackage{siunitx}
@@ -74,10 +77,6 @@ def init_plotting(
                 r'\sansmath'
             ''' if sansmath else '')
             + (bundle['text.latex.preamble'] if bundle else '')
-            + (r'''
-                \usepackage{beton}
-                \usepackage{euler}
-            ''' if venue in ['beamer', 'poster'] else '')
         })
     if venue == 'paper' or bundle:
         rc.update({
