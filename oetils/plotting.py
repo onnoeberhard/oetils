@@ -54,23 +54,30 @@ def init_plotting(
         'axes.labelsize': 11,
         'legend.fontsize': 11,
         'font.family': 'sans-serif' if sans or sansmath else 'serif',
+        'figure.facecolor': (1, 1, 1, 0),
+        'savefig.facecolor': (1, 1, 1, 0),
+        'axes.facecolor': (1, 1, 1, 1)
     }
     if latex:
         rc.update({
-            'text.latex.preamble': (
-                r'\usepackage{lmodern}'
-                r'\usepackage[T1]{fontenc}'
-                r'\usepackage[utf8]{inputenc}'
-                r'\usepackage{amssymb}'
-                r'\usepackage{amsmath}'
-                r'\usepackage{siunitx}'
-                r'\usepackage{physics}'
-                r'\usepackage{bm}'
-            ) + ((
+            'text.latex.preamble': r'''
+                \usepackage{lmodern}
+                \usepackage[T1]{fontenc}
+                \usepackage[utf8]{inputenc}
+                \usepackage{amssymb}
+                \usepackage{amsmath}
+                \usepackage{siunitx}
+                \usepackage{physics}
+                \usepackage{bm}
+            ''' + (r'''
                 r'\usepackage{sansmath}'
                 r'\sansmath'
-            ) if sansmath else '')
+            ''' if sansmath else '')
             + (bundle['text.latex.preamble'] if bundle else '')
+            + (r'''
+                \usepackage{beton}
+                \usepackage{euler}
+            ''' if venue in ['beamer', 'poster'] else '')
         })
     if venue == 'paper' or bundle:
         rc.update({
